@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react"
-import Konva from "konva"
+import { Canvas, FabricImage} from 'fabric'
 import { useEffect } from "react"
 import { useImageLoader } from "~/hooks/use_image_loader"
 
@@ -9,32 +9,27 @@ export default function ShowKonva() {
   useEffect(() => {
     if(!image) { return }
 
-    const stage = new Konva.Stage({
-      container: 'container',
-      width: width,
-      height: height,
-    })
+    const canvas = new Canvas('canvas', {width, height})
 
-    const layer = new Konva.Layer()
-    stage.add(layer)
-
-    const bg = new Konva.Image({
-      x: 0, y: 0, image, width, height
+    const img = new FabricImage(image, {
+      selectable: false, scaleX: width / image.width, scaleY: height / image.height
     })
-    layer.add(bg)
+    canvas.add(img)
 
     return () => {
-      stage.destroy()
+      canvas.dispose()
     }
   }, [image, width, height])
 
   return (
     <div>
       <Link to={'/'}>Back</Link>
-      <h1>Konva</h1>
+      <h1>Fabric</h1>
 
       <input type="file" onChange={onChangeFile} />
-      <div id="container"></div>
+      <div>
+        <canvas id="canvas"/>
+      </div>
     </div>
   )
 }
