@@ -4,6 +4,18 @@ import { useCallback, useEffect, useRef } from "react"
 import { useAnnotationTools } from "~/hooks/use_annotation_tools"
 import { useImageLoader } from "~/hooks/use_image_loader"
 
+// 拡縮時の枠線の太さを固定
+const keepStrokeWidth = (obj: Konva.Rect, strokeWidth: number) => {
+  obj.on('transform', () => {
+    obj.setAttrs({
+      width: Math.max(obj.width() * obj.scaleX(), strokeWidth),
+      height: Math.max(obj.height() * obj.scaleY(), strokeWidth),
+      scaleX: 1,
+      scaleY: 1,
+    })
+  })
+}
+
 export default function ShowKonva() {
   const {image, width, height, onChangeFile} = useImageLoader()
   const layer = useRef<Konva.Layer | null>(null)
@@ -24,18 +36,30 @@ export default function ShowKonva() {
     })
     layer.current.add(rect)
 
-    // 拡縮時の枠線の太さを固定
-    rect.on('transform', () => {
-      rect.setAttrs({
-        width: Math.max(rect.width() * rect.scaleX(), strokeWidth),
-        height: Math.max(rect.height() * rect.scaleY(), strokeWidth),
-        scaleX: 1,
-        scaleY: 1,
-      })
-    })
+    keepStrokeWidth(rect, strokeWidth)
   }, [height, width])
 
-  const {annotationToolsView} = useAnnotationTools({ createStrokedRect })
+  // 矢印の作成
+  const createArrow = useCallback((color: string, strokeWidth: number) => {
+    if(!layer.current) { return }
+
+    const arrow = new Konva.Arrow({
+      name: 'annotation',
+      x: Math.random() * width,
+      y: Math.random() * height,
+      points: [0, 0, 100, 0],
+      pointerLength: 15,
+      pointerWidth: 15,
+      fill: color,
+      stroke: color,
+      strokeWidth,
+      draggable: true,
+    })
+
+    layer.current.add(arrow)
+  }, [height, width])
+
+  const {annotationToolsView} = useAnnotationTools({ createStrokedRect, createArrow })
 
   // canvasの初期化
   useEffect(() => {
