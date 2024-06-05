@@ -11,6 +11,10 @@ ul.annotation-tools li:hover {
   background-color: #eee;
 }
 
+ul.annotation-tools li.active {
+  outline: 2px solid;
+}
+
 .ml20 {
   margin-left: 20px;
 }

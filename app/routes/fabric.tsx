@@ -8,11 +8,19 @@ export default function ShowFabric() {
   const canvas = useRef<Canvas | null>(null)
   const {image, width, height, onChangeFile} = useImageLoader()
 
-  const createStrokedRect = useCallback(() => {
+  // 四角の枠の描画
+  const createStrokedRect = useCallback((color: string, strokeWidth: number) => {
     if(!canvas.current) { return }
 
     const rect = new Rect({
-      left: Math.random() * width, top: Math.random() * height, width: 100, height: 100, fill: 'transparent', stroke: 'red', strokeUniform: true
+      left: Math.random() * width,
+      top: Math.random() * height,
+      width: 100,
+      height: 100,
+      fill: 'transparent',
+      stroke: color,
+      strokeUniform: true,
+      strokeWidth,
     })
 
     canvas.current.add(rect)
@@ -20,13 +28,16 @@ export default function ShowFabric() {
 
   const {annotationToolsView} = useAnnotationTools({ createStrokedRect })
 
+  // canvasの初期化
   useEffect(() => {
     if(!image) { return }
 
     const c = new Canvas('canvas', {width, height})
 
     const img = new FabricImage(image, {
-      selectable: false, scaleX: width / image.width, scaleY: height / image.height
+      selectable: false,
+      scaleX: width / image.width,
+      scaleY: height / image.height,
     })
     c.add(img)
 
