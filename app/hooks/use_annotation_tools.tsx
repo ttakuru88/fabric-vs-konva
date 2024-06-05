@@ -10,7 +10,6 @@ export const useAnnotationTools = ({createStrokedRect}: Props) => {
 
   const annotationToolsView = <ul className="annotation-tools">
     <li><button onClick={() => {createStrokedRect(color, strokeWidth)}}>□</button></li>
-    <li><button>■</button></li>
     <li><button>→</button></li>
     <li className={"ml20 " + (color === 'red' ? 'active' : '')}><button onClick={() => {setColor('red')}}>赤</button></li>
     <li className={color === 'blue' ? 'active' : ''}><button onClick={() => {setColor('blue')}}>青</button></li>
