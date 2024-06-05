@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react"
-import { Canvas, FabricImage, Rect} from 'fabric'
+import { Canvas, FabricImage, Rect, Line, Triangle, Group} from 'fabric'
 import { useCallback, useEffect, useRef } from "react"
 import { useAnnotationTools } from "~/hooks/use_annotation_tools"
 import { useImageLoader } from "~/hooks/use_image_loader"
@@ -26,7 +26,35 @@ export default function ShowFabric() {
     canvas.current.add(rect)
   }, [height, width])
 
-  const {annotationToolsView} = useAnnotationTools({ createStrokedRect })
+  // 矢印の表示
+  const createArrow = useCallback((color: string, strokeWidth: number) => {
+    if(!canvas.current) { return }
+
+    const pos = {
+      x: Math.random() * width,
+      y: Math.random() * height,
+    }
+    const bar = new Line([pos.x, pos.y, pos.x + 100, pos.y],{
+      strokeWidth,
+      stroke: color,
+    })
+
+    const pointerWidth = strokeWidth * 3
+    const pointerLength = strokeWidth * 3
+    const pointer = new Triangle({
+      width: pointerWidth,
+      height: pointerLength,
+      fill: color,
+      left: pos.x + 100 + pointerLength,
+      top: pos.y - pointerWidth / 2,
+      angle: 90,
+    })
+
+    const arrow = new Group([bar, pointer])
+    canvas.current.add(arrow)
+  }, [height, width])
+
+  const {annotationToolsView} = useAnnotationTools({ createStrokedRect, createArrow })
 
   // canvasの初期化
   useEffect(() => {
