@@ -1,23 +1,39 @@
 import { Link } from "@remix-run/react"
-import { Canvas, FabricImage} from 'fabric'
-import { useEffect } from "react"
+import { Canvas, FabricImage, Rect} from 'fabric'
+import { useCallback, useEffect, useRef } from "react"
+import { useAnnotationTools } from "~/hooks/use_annotation_tools"
 import { useImageLoader } from "~/hooks/use_image_loader"
 
-export default function ShowKonva() {
+export default function ShowFabric() {
+  const canvas = useRef<Canvas | null>(null)
   const {image, width, height, onChangeFile} = useImageLoader()
+
+  const createStrokedRect = useCallback(() => {
+    if(!canvas.current) { return }
+
+    const rect = new Rect({
+      left: Math.random() * width, top: Math.random() * height, width: 100, height: 100, fill: 'transparent', stroke: 'red', strokeUniform: true
+    })
+
+    canvas.current.add(rect)
+  }, [height, width])
+
+  const {annotationToolsView} = useAnnotationTools({ createStrokedRect })
 
   useEffect(() => {
     if(!image) { return }
 
-    const canvas = new Canvas('canvas', {width, height})
+    const c = new Canvas('canvas', {width, height})
 
     const img = new FabricImage(image, {
       selectable: false, scaleX: width / image.width, scaleY: height / image.height
     })
-    canvas.add(img)
+    c.add(img)
+
+    canvas.current = c
 
     return () => {
-      canvas.dispose()
+      c.dispose()
     }
   }, [image, width, height])
 
@@ -27,6 +43,9 @@ export default function ShowKonva() {
       <h1>Fabric</h1>
 
       <input type="file" onChange={onChangeFile} />
+
+      { image && annotationToolsView}
+
       <div>
         <canvas id="canvas"/>
       </div>

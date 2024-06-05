@@ -1,0 +1,16 @@
+ul.annotation-tools {
+  list-style-type: none;
+  display: flex;
+}
+
+ul.annotation-tools li {
+  cursor: pointer;
+}
+
+ul.annotation-tools li:hover {
+  background-color: #eee;
+}
+
+.ml20 {
+  margin-left: 20px;
+}
