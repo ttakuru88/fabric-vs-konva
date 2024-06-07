@@ -60,7 +60,7 @@ export default function ShowFabric() {
   useEffect(() => {
     if(!image) { return }
 
-    const c = new Canvas('canvas', {width, height})
+    const c = new Canvas('canvas', {width, height, selection: false})
 
     const img = new FabricImage(image, {
       selectable: false,

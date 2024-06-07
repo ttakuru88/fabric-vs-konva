@@ -87,14 +87,6 @@ export default function ShowKonva() {
     const tr = new KonvaTransformer({ignoreStroke: true})
     layer.current.add(tr)
 
-    // 選択範囲の矩形を用意
-    const selectionRect = new KonvaRect({
-      fill: 'rgba(0,0,255,0.5)',
-      visible: false,
-      listening: false,
-    })
-    layer.current.add(selectionRect)
-
     // 選択範囲の矩形を表示
     let x1: number, y1: number, x2: number, y2: number
     let selecting: boolean = false
@@ -107,8 +99,6 @@ export default function ShowKonva() {
       x1 = x2 = pos.x
       y1 = y2 = pos.y
 
-      selectionRect.width(0)
-      selectionRect.height(0)
       selecting = true;
     });
 
@@ -120,35 +110,25 @@ export default function ShowKonva() {
       x2 = pos.x
       y2 = pos.y
 
-      selectionRect.setAttrs({
-        visible: true,
-        x: Math.min(x1, x2),
-        y: Math.min(y1, y2),
-        width: Math.abs(x2 - x1),
-        height: Math.abs(y2 - y1),
-      })
+      // selectionRect.setAttrs({
+      //   visible: true,
+      //   x: Math.min(x1, x2),
+      //   y: Math.min(y1, y2),
+      //   width: Math.abs(x2 - x1),
+      //   height: Math.abs(y2 - y1),
+      // })
     })
 
     stage.on('mouseup touchend', (e) => {
-      selecting = false;
-      if (!selectionRect.visible()) {return }
+      if (!selecting) { return }
+
       e.evt.preventDefault()
-
-      setTimeout(() => {
-        selectionRect.visible(false)
-      })
-      const shapes = stage.find('.annotation')
-      const box = selectionRect.getClientRect()
-      const selected = shapes.filter((shape) =>
-        Konva.Util.haveIntersection(box, shape.getClientRect())
-      )
-
-      tr.nodes(selected)
+      selecting = false
     });
 
     // クリック時のオブジェクトの選択
     stage.on('click tap', (e) => {
-      if (selectionRect.visible()) { return }
+      if (selecting) { return }
       if (e.target === bg) {
         tr.nodes([])
         return
