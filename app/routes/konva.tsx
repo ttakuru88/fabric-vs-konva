@@ -78,22 +78,18 @@ export default function ShowKonva() {
   useEffect(() => {
     const stg = stage.current
     if(!stg) { return }
+    const bg = stg.children[0].children[0]
+    if(!bg) { return }
 
     let obj: KonvaRect | KonvaArrow | null = null
     let isMousedown = false
 
-    stg.on('mousedown touchstart', () => {
+    stg.on('mousedown touchstart', (e) => {
+      if(e.target !== bg){ return }
       obj = null
       isMousedown = true
       const pos = stg.getPointerPosition()
       if (!pos){ return }
-
-      // カーソル位置に要素があればオブジェクトは追加しない
-      const shapes = stg.find('.annotation')
-      const selected = shapes.filter((shape) =>
-        Konva.Util.haveIntersection({...pos, width: 1, height: 1}, shape.getClientRect())
-      )
-      if(selected.length > 0) { return }
 
       switch(shape) {
         case 'rect':
@@ -141,9 +137,12 @@ export default function ShowKonva() {
       }
       else if(obj instanceof KonvaArrow){
         const points = obj.points()
-        points[2] = pos.x - obj.x()
-        points[3] = pos.y - obj.y()
+        const arrowLength = Math.sqrt((pos.x - obj.x()) ** 2 + (pos.y - obj.y()) ** 2)
+        points[2] = arrowLength
+
+        const angle = Math.atan2(pos.y - obj.y(), pos.x - obj.x())
         obj.points(points)
+        obj.rotation(angle * 180 / Math.PI)
       }
     })
 

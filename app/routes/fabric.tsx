@@ -65,7 +65,7 @@ export default function ShowFabric() {
           pointerWidth = strokeWidth * 3
           pointerLength = strokeWidth * 3
           pointer = new Triangle({
-            width: pointerWidth,
+            width: 1,
             height: pointerLength,
             fill: color,
             left: pos.x + 100 + pointerLength,
@@ -86,9 +86,15 @@ export default function ShowFabric() {
       if(!isMousedown || !obj) { return}
 
       if(obj instanceof Rect){
-        obj.set({width: e.pointer.x - obj.left, height: e.pointer.y - obj.top})
+        obj.set({
+          width: e.scenePoint.x - obj.left,
+          height: e.scenePoint.y - obj.top
+        })
       } else if(obj instanceof Group){
-        obj.set({width: e.pointer.x - obj.left, height: e.pointer.y - obj.top})
+        const arrowLength = Math.sqrt((e.scenePoint.x - obj.left) ** 2 + (e.scenePoint.y - obj.top) ** 2)
+        const angle = Math.atan2(e.scenePoint.y - obj.top, e.scenePoint.x - obj.left)
+        obj.rotate(angle * 180 / Math.PI)
+        obj.set({width: arrowLength})
       }
 
       c.renderAll()
