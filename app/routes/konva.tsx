@@ -153,7 +153,7 @@ export default function ShowKonva() {
     return () => {
       stg.off()
     }
-  }, [color, shape, strokeWidth])
+  }, [image, color, shape, strokeWidth])
 
   return (
     <div>

@@ -107,7 +107,7 @@ export default function ShowFabric() {
     return () => {
       c.off()
     }
-  }, [color, height, shape, strokeWidth, width])
+  }, [image, color, height, shape, strokeWidth, width])
 
   return (
     <div>
