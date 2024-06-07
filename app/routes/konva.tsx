@@ -1,11 +1,16 @@
 import { Link } from "@remix-run/react"
-import Konva from "konva"
+import Konva from "konva/lib/Core"
+import { Rect as KonvaRect } from 'konva/lib/shapes/Rect'
+import { Arrow as KonvaArrow } from 'konva/lib/shapes/Arrow'
+import { Layer as KonvaLayer } from 'konva/lib/Layer'
+import { Image as KonvaImage } from 'konva/lib/shapes/Image'
+import { Transformer as KonvaTransformer } from 'konva/lib/shapes/Transformer'
 import { useCallback, useEffect, useRef } from "react"
 import { useAnnotationTools } from "~/hooks/use_annotation_tools"
 import { useImageLoader } from "~/hooks/use_image_loader"
 
 // 拡縮時の枠線の太さを固定
-const keepStrokeWidth = (obj: Konva.Rect, strokeWidth: number) => {
+const keepStrokeWidth = (obj: KonvaRect, strokeWidth: number) => {
   obj.on('transform', () => {
     obj.setAttrs({
       width: Math.max(obj.width() * obj.scaleX(), strokeWidth),
@@ -18,13 +23,13 @@ const keepStrokeWidth = (obj: Konva.Rect, strokeWidth: number) => {
 
 export default function ShowKonva() {
   const {image, width, height, onChangeFile} = useImageLoader()
-  const layer = useRef<Konva.Layer | null>(null)
+  const layer = useRef<KonvaLayer | null>(null)
 
   // 四角の枠の描画
   const createStrokedRect = useCallback((color: string, strokeWidth: number) => {
     if(!layer.current) { return }
 
-    const rect = new Konva.Rect({
+    const rect = new KonvaRect({
       name: 'annotation',
       x: Math.random() * width,
       y: Math.random() * height,
@@ -43,7 +48,7 @@ export default function ShowKonva() {
   const createArrow = useCallback((color: string, strokeWidth: number) => {
     if(!layer.current) { return }
 
-    const arrow = new Konva.Arrow({
+    const arrow = new KonvaArrow({
       name: 'annotation',
       x: Math.random() * width,
       y: Math.random() * height,
@@ -74,16 +79,16 @@ export default function ShowKonva() {
     layer.current = new Konva.Layer()
     stage.add(layer.current)
 
-    const bg = new Konva.Image({
+    const bg = new KonvaImage({
       x: 0, y: 0, image, width, height
     })
     layer.current.add(bg)
 
-    const tr = new Konva.Transformer({ignoreStroke: true})
+    const tr = new KonvaTransformer({ignoreStroke: true})
     layer.current.add(tr)
 
     // 選択範囲の矩形を用意
-    const selectionRect = new Konva.Rect({
+    const selectionRect = new KonvaRect({
       fill: 'rgba(0,0,255,0.5)',
       visible: false,
       listening: false,
