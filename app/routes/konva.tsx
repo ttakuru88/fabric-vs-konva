@@ -151,7 +151,7 @@ export default function ShowKonva() {
     })
 
     return () => {
-      stg.off()
+      stg.off('mousedown mousemove mouseup touchstart touchmove touchend')
     }
   }, [image, color, shape, strokeWidth])
 
