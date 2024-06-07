@@ -1,13 +1,15 @@
-import { Link } from "@remix-run/react"
 import Konva from 'konva/lib/Core';
+import { Group as KonvaGroup } from 'konva/lib/Group'
 import { Rect as KonvaRect } from 'konva/lib/shapes/Rect'
 import { Arrow as KonvaArrow } from 'konva/lib/shapes/Arrow'
 import { Stage as KonvaStage } from 'konva/lib/Stage'
 import { Image as KonvaImage } from 'konva/lib/shapes/Image'
+import { Pixelate as KonvaPixelate } from 'konva/lib/filters/Pixelate'
 import { Transformer as KonvaTransformer } from 'konva/lib/shapes/Transformer'
 import { useEffect, useRef } from "react"
 import { useAnnotationTools } from "~/hooks/use_annotation_tools"
 import { useImageLoader } from "~/hooks/use_image_loader"
+import { Link } from '@remix-run/react';
 
 // 拡縮時の枠線の太さを固定
 const keepStrokeWidth = (obj: KonvaRect, strokeWidth: number) => {
@@ -77,11 +79,11 @@ export default function ShowKonva() {
 
   useEffect(() => {
     const stg = stage.current
-    if(!stg) { return }
+    if(!stg || !image) { return }
     const bg = stg.children[0].children[0]
     if(!bg) { return }
 
-    let obj: KonvaRect | KonvaArrow | null = null
+    let obj: KonvaRect | KonvaArrow | KonvaGroup | null = null
     let isMousedown = false
 
     stg.on('mousedown touchstart', (e) => {
@@ -90,6 +92,8 @@ export default function ShowKonva() {
       isMousedown = true
       const pos = stg.getPointerPosition()
       if (!pos){ return }
+
+      let imageObj: KonvaImage
 
       switch(shape) {
         case 'rect':
@@ -120,6 +124,39 @@ export default function ShowKonva() {
             draggable: true,
           })
           break
+        case 'mosaic':
+          obj = new KonvaGroup({
+            draggable: true,
+            x: pos.x,
+            y: pos.y,
+            width: 1,
+            height: 1,
+            clip: {
+              x: pos.x,
+              y: pos.y,
+              width: 1,
+              height: 1,
+            }
+          })
+
+          imageObj = new KonvaImage({
+            x: -pos.x, y: -pos.y, image, width, height
+          })
+
+          imageObj.cache()
+          imageObj.filters([KonvaPixelate])
+          imageObj.pixelSize(30)
+
+          obj.on('dragmove', (e) => {
+            const target = e.target as KonvaGroup
+            const image = target.children[0] as KonvaImage
+
+            image.x(-target.x())
+            image.y(-target.y())
+          })
+
+          obj.add(imageObj)
+          break
       }
 
       if(obj) {
@@ -134,8 +171,7 @@ export default function ShowKonva() {
       if(obj instanceof KonvaRect){
         obj.width(pos.x - obj.x())
         obj.height(pos.y - obj.y())
-      }
-      else if(obj instanceof KonvaArrow){
+      } else if(obj instanceof KonvaArrow){
         const points = obj.points()
         const arrowLength = Math.sqrt((pos.x - obj.x()) ** 2 + (pos.y - obj.y()) ** 2)
         points[2] = arrowLength
@@ -143,6 +179,11 @@ export default function ShowKonva() {
         const angle = Math.atan2(pos.y - obj.y(), pos.x - obj.x())
         obj.points(points)
         obj.rotation(angle * 180 / Math.PI)
+      } else if(obj instanceof KonvaGroup) {
+        obj.width(pos.x - obj.x())
+        obj.height(pos.y - obj.y())
+
+        obj.clip({x: 0, y: 0, width: obj.width(), height: obj.height()})
       }
     })
 
@@ -153,7 +194,7 @@ export default function ShowKonva() {
     return () => {
       stg.off('mousedown mousemove mouseup touchstart touchmove touchend')
     }
-  }, [image, color, shape, strokeWidth])
+  }, [image, color, shape, strokeWidth, width, height])
 
   return (
     <div>

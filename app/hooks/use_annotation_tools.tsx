@@ -8,6 +8,7 @@ export const useAnnotationTools = () => {
   const annotationToolsView = <ul className="annotation-tools">
     <li className={shape === 'rect' ? 'active' : ''}><button onClick={() => {setShape('rect')}}>□</button></li>
     <li className={shape === 'arrow' ? 'active' : ''}><button onClick={() => {setShape('arrow')}}>→</button></li>
+    <li className={shape === 'mosaic' ? 'active' : ''}><button onClick={() => {setShape('mosaic')}}>モザ</button></li>
     <li className={"ml20 " + (color === 'red' ? 'active' : '')}><button onClick={() => {setColor('red')}}>赤</button></li>
     <li className={color === 'blue' ? 'active' : ''}><button onClick={() => {setColor('blue')}}>青</button></li>
     <li className={color === 'green' ? 'active' : ''}><button onClick={() => {setColor('green')}}>緑</button></li>

@@ -100,7 +100,7 @@ export default function ShowFabric() {
       c.renderAll()
     })
 
-    c.on('mouse:up', (e) => {
+    c.on('mouse:up', () => {
       isMousedown = false
     })
 
@@ -117,6 +117,7 @@ export default function ShowFabric() {
       <input type="file" onChange={onChangeFile} />
 
       { image && annotationToolsView}
+      { shape === 'mosaic' && <span>モザイク未対応</span>}
 
       <div>
         <canvas id="canvas"/>
