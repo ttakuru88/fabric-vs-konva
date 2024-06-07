@@ -1,17 +1,13 @@
 import { useState } from "react"
 
-interface Props {
-  createStrokedRect: (color: string, strokeWidth: number) => void
-  createArrow: (color: string, strokeWidth: number) => void
-}
-
-export const useAnnotationTools = ({createStrokedRect, createArrow}: Props) => {
+export const useAnnotationTools = () => {
+  const [shape, setShape] = useState<string>('rect')
   const [color, setColor] = useState<string>('red')
   const [strokeWidth, setStrokeWidth] = useState<number>(3)
 
   const annotationToolsView = <ul className="annotation-tools">
-    <li><button onClick={() => {createStrokedRect(color, strokeWidth)}}>□</button></li>
-    <li><button onClick={() => {createArrow(color, strokeWidth)}}>→</button></li>
+    <li className={shape === 'rect' ? 'active' : ''}><button onClick={() => {setShape('rect')}}>□</button></li>
+    <li className={shape === 'arrow' ? 'active' : ''}><button onClick={() => {setShape('arrow')}}>→</button></li>
     <li className={"ml20 " + (color === 'red' ? 'active' : '')}><button onClick={() => {setColor('red')}}>赤</button></li>
     <li className={color === 'blue' ? 'active' : ''}><button onClick={() => {setColor('blue')}}>青</button></li>
     <li className={color === 'green' ? 'active' : ''}><button onClick={() => {setColor('green')}}>緑</button></li>
@@ -19,5 +15,5 @@ export const useAnnotationTools = ({createStrokedRect, createArrow}: Props) => {
     <li className={strokeWidth === 10 ? 'active' : ''}><button onClick={() => {setStrokeWidth(10)}}>太</button></li>
   </ul>
 
-  return { annotationToolsView, }
+  return { annotationToolsView, color, strokeWidth, shape}
 }
